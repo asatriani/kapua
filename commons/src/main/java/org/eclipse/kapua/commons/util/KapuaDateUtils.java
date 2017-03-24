@@ -57,4 +57,30 @@ public class KapuaDateUtils {
         return Instant.from(formatter.parse(date));
     }
 
+    /**
+     * Parse the provided String using the provided pattern and the default locale {@link #getKapuaLocale() getKapuaLocale}
+     *
+     * @param pattern
+     * @param date
+     * @return
+     * @throws ParseException
+     */
+    public static Date parseDate(String pattern, String date) throws ParseException {
+        DateFormat df = new SimpleDateFormat(pattern, getKapuaLocale());
+        return df.parse(date);
+    }
+
+    /**
+     * Format the provided Date using the provided pattern and the default locale {@link #getKapuaLocale() getKapuaLocale}
+     *
+     * @param pattern
+     * @param date
+     * @return
+     * @throws ParseException
+     */
+    public static String formatDate(String pattern, Date date) throws ParseException {
+        DateFormat df = new SimpleDateFormat(pattern, getKapuaLocale());
+        return df.format(date);
+    }
+
 }
