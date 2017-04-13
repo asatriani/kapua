@@ -8,7 +8,7 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.datastore.internal.elasticsearch;
+package org.eclipse.kapua.service.datastore.internal.client;
 
 import java.time.Duration;
 import java.time.ZoneOffset;
@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.kapua.service.datastore.internal.mediator.MessageStoreConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 

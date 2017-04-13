@@ -8,53 +8,54 @@
  * Contributors:
  *     Red Hat Inc - initial API and implementation
  *******************************************************************************/
-package org.eclipse.kapua.service.datastore.internal.elasticsearch;
+package org.eclipse.kapua.service.datastore.internal.client;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.assertj.core.api.Assertions;
+import org.eclipse.kapua.service.datastore.internal.mediator.DatastoreUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EsUtilsConvertDateTest {
+public class ClientUtilsConvertDateTest {
 
     @Test
     public void convertNull1() {
-        Assert.assertNull(EsUtils.convertToKapuaObject("date", null));
+        Assert.assertNull(DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, null));
     }
 
     @Test
     public void convertWithMillis1() {
-        Assertions.assertThat(EsUtils.convertToKapuaObject("date", "2017-01-02T12:34:56.123Z"))
+        Assertions.assertThat(DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, "2017-01-02T12:34:56.123Z"))
                 .isInstanceOf(Date.class)
                 .isEqualTo(Date.from(ZonedDateTime.of(2017, 1, 2, 12, 34, 56, 123_000_000, ZoneOffset.UTC).toInstant()));
     }
     
     @Test
     public void convertWithMillis2() {
-        Assertions.assertThat(EsUtils.convertToKapuaObject("date", "2017-01-02T12:34:56.123"))
+        Assertions.assertThat(DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, "2017-01-02T12:34:56.123"))
                 .isInstanceOf(Date.class)
                 .isEqualTo(Date.from(ZonedDateTime.of(2017, 1, 2, 12, 34, 56, 123_000_000, ZoneOffset.UTC).toInstant()));
     }
 
     @Test
     public void convertNoMillis1() {
-        Assertions.assertThat(EsUtils.convertToKapuaObject("date", "2017-01-02T13:34:56Z"))
+        Assertions.assertThat(DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, "2017-01-02T13:34:56Z"))
                 .isInstanceOf(Date.class)
                 .isEqualTo(Date.from(ZonedDateTime.of(2017, 1, 2, 13, 34, 56, 0, ZoneOffset.UTC).toInstant()));
     }
     
     @Test
     public void convertNoMillis2() {
-        Assertions.assertThat(EsUtils.convertToKapuaObject("date", "2017-01-02T13:34:56"))
+        Assertions.assertThat(DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, "2017-01-02T13:34:56"))
                 .isInstanceOf(Date.class)
                 .isEqualTo(Date.from(ZonedDateTime.of(2017, 1, 2, 13, 34, 56, 0, ZoneOffset.UTC).toInstant()));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void convertWrongFormat() {
-        EsUtils.convertToKapuaObject("date", "");
+        DatastoreUtils.convertToCorrectType(DatastoreUtils.CLIENT_METRIC_TYPE_DATE_ACRONYM, "");
     }
 }

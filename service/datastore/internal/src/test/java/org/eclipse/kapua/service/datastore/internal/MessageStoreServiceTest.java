@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.kapua.KapuaException;
-import org.eclipse.kapua.commons.util.KapuaDateUtils;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.message.KapuaChannel;
 import org.eclipse.kapua.message.KapuaPosition;
@@ -115,7 +114,7 @@ public class MessageStoreServiceTest extends AbstractMessageStoreServiceTest {
     private static final MetricInfoRegistryService metricInfoRegistryService = KapuaLocator.getInstance().getService(MetricInfoRegistryService.class);
     private static final ClientInfoRegistryService clientInfoRegistryService = KapuaLocator.getInstance().getService(ClientInfoRegistryService.class);
 
-    private long clientRefreshTime = (DatastoreSettings.getInstance().getLong(DatastoreSettingKey.INDEX_REFRESH_INTERVAL) + INDEX_TIME_ESTIMATE_SECONDS) * KapuaDateUtils.SEC_MILLIS;
+    private Duration clientRefreshTime = Duration.ofSeconds((DatastoreSettings.getInstance().getLong(DatastoreSettingKey.INDEX_REFRESH_INTERVAL) + INDEX_TIME_ESTIMATE_SECONDS));
 
     @Test
     /**
@@ -1053,7 +1052,7 @@ public class MessageStoreServiceTest extends AbstractMessageStoreServiceTest {
 
     private void waitClientRefresh() throws InterruptedException {
         // Wait ES indexes to be refreshed
-        Thread.sleep(clientRefreshTime);
+        Thread.sleep(clientRefreshTime.toMillis());
     }
 
     /**
@@ -2019,7 +2018,7 @@ public class MessageStoreServiceTest extends AbstractMessageStoreServiceTest {
 
         //
         // Wait ES indexes to be refreshed
-        Thread.sleep(clientRefreshTime);
+        waitClientRefresh();
 
         //
         // Retrieve the message from its id

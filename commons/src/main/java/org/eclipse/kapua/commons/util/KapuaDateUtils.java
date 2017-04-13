@@ -12,11 +12,14 @@
  *******************************************************************************/
 package org.eclipse.kapua.commons.util;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -66,7 +69,7 @@ public class KapuaDateUtils {
      * @throws ParseException
      */
     public static Date parseDate(String pattern, String date) throws ParseException {
-        DateFormat df = new SimpleDateFormat(pattern, getKapuaLocale());
+        DateFormat df = new SimpleDateFormat(pattern, Locale.US);
         return df.parse(date);
     }
 
@@ -79,7 +82,7 @@ public class KapuaDateUtils {
      * @throws ParseException
      */
     public static String formatDate(String pattern, Date date) throws ParseException {
-        DateFormat df = new SimpleDateFormat(pattern, getKapuaLocale());
+        DateFormat df = new SimpleDateFormat(pattern, Locale.US);
         return df.format(date);
     }
 

@@ -12,12 +12,11 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.datastore.internal.mediator;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAccessor;
+import java.util.Base64;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -53,25 +52,17 @@ public class DatastoreUtils {
     public static final String CLIENT_METRIC_TYPE_BOOLEAN = "boolean";
     public static final String CLIENT_METRIC_TYPE_BINARY = "binary";
 
-    public static final String CLIENT_METRIC_TYPE_SHORT_STRING = "str";
-    public static final String CLIENT_METRIC_TYPE_SHORT_INTEGER = "int";
-    public static final String CLIENT_METRIC_TYPE_SHORT_LONG = "lng";
-    public static final String CLIENT_METRIC_TYPE_SHORT_FLOAT = "flt";
-    public static final String CLIENT_METRIC_TYPE_SHORT_DOUBLE = "dbl";
-    public static final String CLIENT_METRIC_TYPE_SHORT_DATE = "dte";
-    public static final String CLIENT_METRIC_TYPE_SHORT_BOOLEAN = "bln";
-    public static final String CLIENT_METRIC_TYPE_SHORT_BINARY = "bin";
-
+    public static final String CLIENT_METRIC_TYPE_STRING_ACRONYM = "str";
+    public static final String CLIENT_METRIC_TYPE_INTEGER_ACRONYM = "int";
+    public static final String CLIENT_METRIC_TYPE_LONG_ACRONYM = "lng";
+    public static final String CLIENT_METRIC_TYPE_FLOAT_ACRONYM = "flt";
+    public static final String CLIENT_METRIC_TYPE_DOUBLE_ACRONYM = "dbl";
+    public static final String CLIENT_METRIC_TYPE_DATE_ACRONYM = "dte";
+    public static final String CLIENT_METRIC_TYPE_BOOLEAN_ACRONYM = "bln";
+    public static final String CLIENT_METRIC_TYPE_BINARY_ACRONYM = "bin";
+    // acronym
     private static final DateTimeFormatter DATA_INDEX_FORMATTER = DateTimeFormatter.ofPattern("yyyy-ww");
     
-    private static final DateTimeFormatter FORMAT_1 = new DateTimeFormatterBuilder()
-            .appendPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
-            .optionalStart()
-            .appendOffsetId()
-            .toFormatter().withZone(ZoneOffset.UTC);
-    
-    private static final DateTimeFormatter FORMAT_2 = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
-
     /**
      * Return the hash code for the provided components (typically components are a sequence of account - client id - channel ...)
      * 
@@ -90,9 +81,6 @@ public class DatastoreUtils {
 
         // ES 5.2 FIX
         // return Base64.encodeBytes(hashCode);
-    }
-    
-
         return Base64.getEncoder().encodeToString(hashCode);
     }
 
@@ -220,7 +208,7 @@ public class DatastoreUtils {
      * @return
      */
     public static String getDataIndexName(KapuaId scopeId, long timestamp) {
-        final String actualName = EsUtils.normalizedIndexName(scopeId.toStringId());
+        final String actualName = DatastoreUtils.normalizedIndexName(scopeId.toStringId());
 
         final StringBuilder sb = new StringBuilder(actualName).append('-');
         DATA_INDEX_FORMATTER.formatTo(Instant.ofEpochMilli(timestamp).atOffset(ZoneOffset.UTC), sb);
@@ -309,28 +297,28 @@ public class DatastoreUtils {
      */
     public static String getClientMetricFromAcronym(String acronym) {
         if (CLIENT_METRIC_TYPE_STRING.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_STRING;
+            return CLIENT_METRIC_TYPE_STRING_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_INTEGER.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_INTEGER;
+            return CLIENT_METRIC_TYPE_INTEGER_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_LONG.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_LONG;
+            return CLIENT_METRIC_TYPE_LONG_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_FLOAT.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_FLOAT;
+            return CLIENT_METRIC_TYPE_FLOAT_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_DOUBLE.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_DOUBLE;
+            return CLIENT_METRIC_TYPE_DOUBLE_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_BOOLEAN.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_BOOLEAN;
+            return CLIENT_METRIC_TYPE_BOOLEAN_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_DATE.equals(acronym))
-            return CLIENT_METRIC_TYPE_SHORT_DATE;
+            return CLIENT_METRIC_TYPE_DATE_ACRONYM;
 
         if (CLIENT_METRIC_TYPE_BINARY.equals(acronym)) {
-            return CLIENT_METRIC_TYPE_SHORT_BINARY;
+            return CLIENT_METRIC_TYPE_BINARY_ACRONYM;
         }
 
         throw new IllegalArgumentException(String.format("Unknown type [%s]", acronym));
@@ -415,7 +403,7 @@ public class DatastoreUtils {
      */
     public static Object convertToCorrectType(String acronymType, Object value) {
         Object convertedValue = null;
-        if (CLIENT_METRIC_TYPE_SHORT_DOUBLE.equals(acronymType)) {
+        if (CLIENT_METRIC_TYPE_DOUBLE_ACRONYM.equals(acronymType)) {
             if (value instanceof Number) {
                 convertedValue = new Double(((Number) value).doubleValue());
             } else if (value instanceof String) {
@@ -423,7 +411,7 @@ public class DatastoreUtils {
             } else {
                 throw new IllegalArgumentException(String.format("Type [%s] cannot be converted to Double!", value.getClass()));
             }
-        } else if (CLIENT_METRIC_TYPE_SHORT_FLOAT.equals(acronymType)) {
+        } else if (CLIENT_METRIC_TYPE_FLOAT_ACRONYM.equals(acronymType)) {
             if (value instanceof Number) {
                 convertedValue = new Float(((Number) value).floatValue());
             } else if (value instanceof String) {
@@ -431,7 +419,7 @@ public class DatastoreUtils {
             } else {
                 throw new IllegalArgumentException(String.format("Type [%s] cannot be converted to Double!", value.getClass()));
             }
-        } else if (CLIENT_METRIC_TYPE_SHORT_INTEGER.equals(acronymType)) {
+        } else if (CLIENT_METRIC_TYPE_INTEGER_ACRONYM.equals(acronymType)) {
             if (value instanceof Number) {
                 convertedValue = new Integer(((Number) value).intValue());
             } else if (value instanceof String) {
@@ -439,7 +427,7 @@ public class DatastoreUtils {
             } else {
                 throw new IllegalArgumentException(String.format("Type [%s] cannot be converted to Double!", value.getClass()));
             }
-        } else if (CLIENT_METRIC_TYPE_SHORT_LONG.equals(acronymType)) {
+        } else if (CLIENT_METRIC_TYPE_LONG_ACRONYM.equals(acronymType)) {
             if (value instanceof Number) {
                 convertedValue = new Long(((Number) value).longValue());
             } else if (value instanceof String) {
